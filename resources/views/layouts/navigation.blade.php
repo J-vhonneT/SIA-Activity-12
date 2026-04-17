@@ -1,4 +1,3 @@
-
 <nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,6 +15,15 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
+                        {{ __('Reservations') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
+                        {{ __('QR Code') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('cabinet-access-guide.index')" :active="request()->routeIs('cabinet-access-guide.index')">
+                        {{ __('Cabinet Access Guide') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -23,15 +31,16 @@
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            
-                        @if(Auth::user()->profile_photo)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
-                                style="width:40px;height:40px;border-radius:50%;object-fit:cover;"
-                                class="border border-gray-300">
-                        @else
-                            <x-avatar :name="Auth::user()->name" />
-                        @endif
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-800 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            @if (Auth::user()->profile_photo)
+                                <img src="{{ asset('storage/' . Auth::user()->profile_photo) }}"
+                                    style="width:40px;height:40px;border-radius:50%;object-fit:cover;"
+                                    class="border border-gray-300">
+                            @else
+                                <x-avatar :name="Auth::user()->name" />
+                            @endif
+
+                            <div class="ms-3 text-sm font-semibold text-black truncate max-w-[150px]">{{ Auth::user()->name }} </div>
 
                             <div class="ms-2">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -77,6 +86,15 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
+                {{ __('Reservations') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
+                {{ __('QR Code') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('cabinet-access-guide.index')" :active="request()->routeIs('cabinet-access-guide.index')">
+                {{ __('Cabinet Access Guide') }}
             </x-responsive-nav-link>
         </div>
 

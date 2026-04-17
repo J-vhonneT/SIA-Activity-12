@@ -6,6 +6,9 @@
 
         <title>Helmet Reservation Storage</title>
 
+        <!-- Custom Favicon -->
+        <link rel="icon" type="image/png" href="{{ asset('images/helmet-logo-bg.png') }}">
+        
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
@@ -51,7 +54,11 @@
         </header>
         <div class="flex items-center justify-center w-full transition-opacity opacity-100 duration-750 lg:grow starting:opacity-0">
             <main class="flex max-w-[335px] w-full flex-col-reverse lg:max-w-4xl lg:flex-row">
-                <div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white dark:bg-[#161615] dark:text-[#EDEDEC] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
+<div class="text-[13px] leading-[20px] flex-1 p-6 pb-12 lg:p-20 bg-white/10 dark:bg-black/20 backdrop-blur-xl border border-white/20 dark:border-black/30 dark:text-[#EDEDEC] shadow-[0_25px_50px_-12px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.2),inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] dark:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.1),inset_0px_0px_0px_1px_#fffaed2d] rounded-bl-lg rounded-br-lg lg:rounded-tl-lg lg:rounded-br-none">
+</xai:function_call > 
+
+<xai:function_call name="edit_file">
+<parameter name="path">
                     <h1 class="mb-1 font-medium">Welcome to Helmet Reservation Storage System</h1>
                     <p class="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
                         Manage and reserve safety helmets efficiently.<br>
