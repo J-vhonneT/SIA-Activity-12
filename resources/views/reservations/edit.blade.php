@@ -42,15 +42,9 @@
                             </div>
 
                             <div>
-                                <x-input-label for="duration_hours" :value="__('Duration (in hours)')" />
-                                <select id="duration_hours" name="duration_hours" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <option value="{{ $i }}" {{ old('duration_hours', $reservation->duration_hours) == $i ? 'selected' : '' }}>
-                                            {{ $i }} {{ $i == 1 ? 'hour' : 'hours' }}
-                                        </option>
-                                    @endfor
-                                </select>
-                                <x-input-error :messages="$errors->get('duration_hours')" class="mt-2" />
+                                <x-input-label for="reservation_time" :value="__('Reservation Time')" />
+                                <x-text-input id="reservation_time" name="reservation_time" type="time" class="mt-1 block w-full" :value="old('reservation_time', $reservation->reservation_time)" required />
+                                <x-input-error :messages="$errors->get('reservation_time')" class="mt-2" />
                             </div>
                         </div>
 

@@ -15,15 +15,20 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
-                        {{ __('Reservations') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
-                        {{ __('QR Code') }}
-                    </x-nav-link>
                     <x-nav-link :href="route('cabinet-access-guide.index')" :active="request()->routeIs('cabinet-access-guide.index')">
                         {{ __('Cabinet Access Guide') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
+                        {{ __('Make a Reservation') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
+                        {{ __('QR Code') }}
+                    </x-nav-link>
+                    @if(in_array(Auth::user()->role, ['admin', 'staff']))
+                        <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
+                            {{ __('Manage Reservations') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -87,15 +92,20 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
-                {{ __('Reservations') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
-                {{ __('QR Code') }}
-            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('cabinet-access-guide.index')" :active="request()->routeIs('cabinet-access-guide.index')">
                 {{ __('Cabinet Access Guide') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
+                {{ __('Make a Reservation') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
+                {{ __('QR Code') }}
+            </x-responsive-nav-link>
+            @if(in_array(Auth::user()->role, ['admin', 'staff']))
+                <x-responsive-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
+                    {{ __('Manage Reservations') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

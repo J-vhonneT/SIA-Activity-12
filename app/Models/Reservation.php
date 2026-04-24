@@ -11,5 +11,19 @@ class Reservation extends Model
         'slot_number',
         'reservation_date',
         'reservation_time',
+        'expires_at',
     ];
+
+    public function qrCode()
+    {
+        return $this->hasOne(QRCode::class);
+    }
+
+    /**
+     * Get the transaction log for the reservation.
+     */
+    public function transactions()
+    {
+        return $this->hasMany(ReservationTransaction::class);
+    }
 }
