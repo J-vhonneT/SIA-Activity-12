@@ -80,41 +80,84 @@ class ReservationController extends Controller
     public function create()
     {
         $slots = range(1, 12);
-        $bookedSlots = Reservation::where('reservation_date', Carbon::today())->pluck('slot_number')->toArray();
-        return view('reservations.create', compact('slots', 'bookedSlots'));
+        // Data for the new time-range based UI
+        $todaysReservations = Reservation::whereDate('reservation_date', Carbon::today())
+                                     ->where('expires_at', '>', now()->toDateTimeString())
+                                     ->orderBy('start_time')
+                                     ->get();
+
+        return view('reservations.create', compact('slots', 'todaysReservations'));
+    }
+
+    public function getBookedSlots(Request $request)
+    {
+        $request->validate([
+            'date' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
+        ]);
+
+        // Explicitly format times to strings for robust database comparison
+        $startTime = Carbon::createFromFormat('H:i', $request->start_time)->format('H:i:s');
+        $endTime = Carbon::createFromFormat('H:i', $request->end_time)->format('H:i:s');
+
+        // Find all slots that have a reservation that overlaps with the requested time range.
+        $bookedSlots = Reservation::where('reservation_date', $request->date)
+            ->where('expires_at', '>', now()->toDateTimeString())
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where('start_time', '<', $endTime)
+                      ->where('end_time', '>', $startTime);
+            })
+            ->pluck('slot_number')
+            ->unique()
+            ->toArray();
+
+        return response()->json(['booked_slots' => $bookedSlots]);
     }
 
 
     public function store(Request $request)
     {
-        // First, check if the day is already full.
-        $reservationsToday = Reservation::where('reservation_date', $request->reservation_date)->count();
-        if ($reservationsToday >= 12) {
-            return back()->with('error', 'Sorry, all slots for this day are already booked.');
-        }
-
         $request->validate([
-            'slot_number' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:12',
-                Rule::unique('reservations')->where(function ($query) use ($request) {
-                    return $query->where('reservation_date', $request->reservation_date)
-                                 ->where('reservation_time', $request->reservation_time);
-                }),
-            ],
+            'slot_number' => ['required', 'integer', 'min:1', 'max:12'],
             'reservation_date' => 'required|date',
-            'reservation_time' => 'required', // Changed from duration_hours
-        ], [
-            'slot_number.unique' => 'This slot is already booked for the selected date and time. Please choose another time or slot.'
+            'start_time' => 'required|date_format:H:i',
+            'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
 
+        $startTime = Carbon::createFromFormat('H:i', $request->start_time);
+        $endTime = Carbon::createFromFormat('H:i', $request->end_time);
+
+        // Rule 1: Enforce the 5-hour maximum booking duration.
+        if ($startTime->diffInHours($endTime) > 5) {
+            return back()->with('error', 'You can book a slot for a maximum of 5 hours.');
+        }
+
+        // Explicitly format times for the query
+        $startTimeStr = $startTime->format('H:i:s');
+        $endTimeStr = $endTime->format('H:i:s');
+
+        // Rule 2: Check for conflicting reservations.
+        $isConflict = Reservation::where('slot_number', $request->slot_number)
+            ->where('reservation_date', $request->reservation_date)
+            ->where('expires_at', '>', now()->toDateTimeString())
+            ->where(function ($query) use ($startTimeStr, $endTimeStr) {
+                $query->where('start_time', '<', $endTimeStr)
+                      ->where('end_time', '>', $startTimeStr);
+            })
+            ->exists();
+
+        if ($isConflict) {
+            return back()->with('error', 'This slot is unavailable for the selected time range. It conflicts with an existing booking.');
+        }
+
+        // All checks passed, create the reservation.
         $reservation = Reservation::create([
             'user_id' => auth()->id(),
             'slot_number' => $request->slot_number,
             'reservation_date' => $request->reservation_date,
-            'reservation_time' => $request->reservation_time,
+            'start_time' => $startTimeStr,
+            'end_time' => $endTimeStr,
             'expires_at' => Carbon::now()->addHours(24),
         ]);
 

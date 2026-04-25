@@ -10,13 +10,32 @@ class Reservation extends Model
         'user_id',
         'slot_number',
         'reservation_date',
-        'reservation_time',
+        'start_time',
+        'end_time',
         'expires_at',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'expires_at' => 'datetime',
+        'reservation_date' => 'date',
     ];
 
     public function qrCode()
     {
         return $this->hasOne(QRCode::class);
+    }
+
+    /**
+     * Get the user that owns the reservation.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     /**
