@@ -21,7 +21,7 @@
                     <x-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
                         {{ __('Make a Reservation') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
+                    <x-nav-link :href="in_array(Auth::user()->role, ['admin', 'staff']) ? route('qr-code.index') : route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
                         {{ __('QR Code') }}
                     </x-nav-link>
                     @if(in_array(Auth::user()->role, ['admin', 'staff']))
@@ -98,7 +98,7 @@
             <x-responsive-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
                 {{ __('Make a Reservation') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
+            <x-responsive-nav-link :href="in_array(Auth::user()->role, ['admin', 'staff']) ? route('qr-code.index') : route('qr-code.latest')" :active="request()->routeIs('qr-code.index')">
                 {{ __('QR Code') }}
             </x-responsive-nav-link>
             @if(in_array(Auth::user()->role, ['admin', 'staff']))

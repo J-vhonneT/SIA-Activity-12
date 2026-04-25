@@ -81,7 +81,7 @@ class ReservationController extends Controller
     {
         $slots = range(1, 12);
         $bookedSlots = Reservation::where('reservation_date', Carbon::today())->pluck('slot_number')->toArray();
-        return view('reservations.index', compact('slots', 'bookedSlots'));
+        return view('reservations.create', compact('slots', 'bookedSlots'));
     }
 
 
@@ -145,8 +145,10 @@ class ReservationController extends Controller
             'event_timestamp' => now(),
         ]);
 
-        return redirect()->route('qr-code.index', ['reservation_id' => $reservation->id])
-                         ->with('success', 'Reservation confirmed successfully!');
+        return redirect()->route('dashboard')
+                         ->with('success', 'Reservation confirmed successfully!')
+                         ->with('new_qr_code', $qrCodeData)
+                         ->with('new_reservation', $reservation);
     }
 
     public function showLatestQr()

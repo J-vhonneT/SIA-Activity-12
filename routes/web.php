@@ -19,9 +19,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Routes for all authenticated users
     Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+    Route::get('/booking-success/{reservation}', [ReservationController::class, 'showBookingSuccess'])->name('reservations.booking-success');
+
     Route::get('/cabinet-access-guide', function () {
         return view('cabinet-access-guide.index');
     })->name('cabinet-access-guide.index');
+
+    Route::get('/qr-code', [QRCodeController::class, 'index'])->name('qr-code.index');
+    Route::get('/qr-code/latest', [QRCodeController::class, 'latest'])->name('qr-code.latest');
 
     // Routes accessible only by admin and staff
     Route::middleware('role:admin,staff')->group(function () {
@@ -31,8 +36,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 
         Route::get('/reservations/pdf', [App\Http\Controllers\ReservationController::class, 'exportPDF'])->name('reservations.pdf');
-        Route::get('/qr-code', [QRCodeController::class, 'index'])->name('qr-code.index');
-        Route::get('/qr-code/latest', [QRCodeController::class, 'latest'])->name('qr-code.latest');
     });
 });
 

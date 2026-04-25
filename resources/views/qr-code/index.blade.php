@@ -69,26 +69,28 @@
     @else
         {{-- User View --}}
         <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="max-w-lg mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                     <div class="p-8 text-center">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Your QR Code</h2>
-                        <p class="text-gray-500 mb-6">Scan this code at the cabinet to unlock it.</p>
-
-                        <div class="bg-white p-4 rounded-lg inline-block mb-4 border">
-                            @if($latestReservation->qrCode)
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">Your Latest QR Code</h2>
+                        <p class="text-gray-500 mb-6">This is the QR code for your most recent booking. Scan it at the cabinet to unlock.</p>
+                        
+                        @if($latestReservation && $latestReservation->qrCode)
+                            <div class="bg-gray-50 p-6 rounded-xl inline-block border">
                                 {!! $latestReservation->qrCode->qr_code_data !!}
-                            @else
-                                <div class="p-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                                    QR Code not found for this reservation.
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="text-center mb-6">
-                            <p class="text-sm text-gray-500">Reservation ID</p>
-                            <p class="text-2xl font-bold text-gray-800 tracking-wider">{{ $latestReservation->id }}</p>
-                        </div>
+                                <p class="mt-4 text-sm font-semibold text-gray-700 tracking-wider">
+                                    Booking ID: <span class="font-bold text-gray-900">{{ $latestReservation->id }}</span>
+                                </p>
+                            </div>
+                        @else
+                            <div class="bg-red-50 border border-red-200 p-6 rounded-xl text-center">
+                                <h3 class="text-lg font-bold text-red-800">No Active QR Code</h3>
+                                <p class="text-red-600 mt-2">You do not have any active reservations with a QR code. Please make a reservation first.</p>
+                                <a href="{{ route('reservations.create') }}" class="mt-4 inline-block px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700">
+                                    Make a Reservation
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
