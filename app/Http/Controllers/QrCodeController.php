@@ -27,7 +27,7 @@ class QrCodeController extends Controller
                 })->orWhere('slot_number', 'like', "%{$search}%");
             }
 
-            $reservations = $query->paginate(10);
+            $reservations = $query->paginate(5);
 
             return view('qr-code.index', compact('reservations'));
         } else {

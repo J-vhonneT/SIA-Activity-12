@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $stats = [];
         $cabinets = [];
 
-        if ($user->role === 'admin' || $user->role === 'staff') {
+        if ($user->role === 'admin') {
             $totalCabinets = 12; // Corrected to 12 total cabinets
             $reservationsToday = Reservation::with('user')
                                 ->whereDate('reservation_date', Carbon::today())
@@ -45,7 +45,8 @@ class DashboardController extends Controller
                     $cabinets[$i] = [
                         'status' => 'reserved',
                         'user_name' => $reservation->user->name,
-                        'time' => Carbon::parse($reservation->reservation_time)->format('g:i A'),
+                        'time' => Carbon::parse($reservation->start_time)->format('g:i A') . ' - ' .
+                                Carbon::parse($reservation->end_time)->format('g:i A'),
                     ];
                 } else {
                     $cabinets[$i] = [

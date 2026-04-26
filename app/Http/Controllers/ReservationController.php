@@ -55,28 +55,29 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
     {
-        // $this->authorize('update', $reservation);
-
-        $validated = $request->validate([
-            'slot_number' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:12',
-                Rule::unique('reservations')->where(function ($query) use ($request, $reservation) {
-                    return $query->where('reservation_date', $request->reservation_date)
-                                 ->where('id', '!=', $reservation->id);
-                }),
-            ],
-            'reservation_date' => 'required|date',
-            'reservation_time' => 'required|date_format:H:i',
-        ]);
-
-        $reservation->update($validated);
-
-        return redirect()->route('reservations.index')->with('success', 'Reservation updated successfully!');
+         if (!auth()->user()->hasRole('admin')) {
+        abort(403);
     }
- 
+
+    $request->validate([
+        'slot_number' => 'required|integer|min:1|max:12',
+        'start_time' => 'required',
+    ]);
+
+    // ALWAYS compute end time
+    $start = $request->start_time;
+    $end = \Carbon\Carbon::parse($start)->addHour()->format('H:i');
+
+    $reservation->update([
+        'slot_number' => $request->slot_number,
+        'start_time' => $start,
+        'end_time' => $end,
+    ]);
+
+    return redirect()->route('manage-reservations')
+        ->with('success', 'Reservation updated!');
+}
+    
     public function create()
     {
         $slots = range(1, 12);
@@ -216,9 +217,14 @@ class ReservationController extends Controller
 
     public function destroy(Reservation $reservation)
     {
-        // $this->authorize('delete', $reservation);
-        $reservation->delete();
-        return redirect()->route('reservations.index')->with('success', 'Reservation cancelled successfully!');
+       if (!auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
+
+    $reservation->delete();
+
+    return redirect()->route('manage-reservations')
+        ->with('success', 'Reservation deleted successfully.');
     }
 
     public function exportPDF()
@@ -226,5 +232,44 @@ class ReservationController extends Controller
         $reservations = Reservation::where('user_id', auth()->id())->get();
         $pdf = app('dompdf.wrapper')->loadView('reservations.pdf', compact('reservations'));
         return $pdf->download('reservations.pdf');
+    }
+
+    /**
+     * Admin: Manage all reservations with pagination
+     */
+    public function manageReservations(Request $request)
+    {
+        $query = Reservation::with('user');
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('id', 'like', "%$search%")
+                  ->orWhereHas('user', function ($q) use ($search) {
+                      $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%");
+                  });
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $reservations = $query->orderBy('created_at', 'desc')->paginate(5);
+
+        return view('manage-reservations', compact('reservations'));
+    }
+
+    /**
+     * Admin: Export all reservations as PDF
+     */
+    public function exportAdminPDF()
+    {
+        $reservations = Reservation::with('user')->orderBy('created_at', 'desc')->get();
+        $pdf = app('dompdf.wrapper')->loadView('reservations.pdf', compact('reservations'));
+        return $pdf->download('all-reservations-' . now()->format('Y-m-d') . '.pdf');
     }
 }

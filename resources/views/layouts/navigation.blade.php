@@ -12,14 +12,11 @@
             {{ __('Dashboard') }}
         </x-nav-link>
 
-        @if(in_array(Auth::user()->role, ['admin', 'staff']))
-            <x-nav-link :href="route('cabinet-access-guide.index')" :active="request()->routeIs('cabinet-access-guide.index')">
-                {{ __('Cabinet Access Guide') }}
-            </x-nav-link>
+        @if(in_array(Auth::user()->role, ['admin']))
             <x-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
-                {{ __('QR Code') }}
+                {{ __('User Reservations') }}
             </x-nav-link>
-            <x-nav-link :href="route('reservations.index')" :active="request()->routeIs('reservations.index')">
+            <x-nav-link :href="route('manage-reservations')" :active="request()->routeIs('manage-reservations')">
                 {{ __('Manage Reservations') }}
             </x-nav-link>
         @else
@@ -27,7 +24,7 @@
                 {{ __('Cabinet Access Guide') }}
             </x-nav-link>
             <x-nav-link :href="route('reservations.create')" :active="request()->routeIs('reservations.create')">
-                {{ __('Make a Reservation') }}
+                {{ __('Reservations') }}
             </x-nav-link>
             <x-nav-link :href="route('qr-code.index')" :active="request()->routeIs('qr-code.index')">
                 {{ __('QR Code') }}

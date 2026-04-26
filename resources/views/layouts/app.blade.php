@@ -37,7 +37,24 @@
 
                 <!-- Page Content -->
                 <main class="flex-1">
-                    {{ $slot }}
+                    @if(auth()->check() && auth()->user()->role === 'admin')
+                        <div class="p-6">
+                            <h2 class="text-lg font-bold mb-4">Admin Panel</h2>
+
+                            <div class="mb-4">
+                                <a href="/admin/dashboard" class="mr-4 text-blue-600">Dashboard</a>
+                                <a href="/users" class="text-blue-600">Manage Users</a>
+                                <a href="/views/manage-reservations" class="mr-4 text-blue-600">Manage Reservations</a>
+                            </div>
+
+                            {{ $slot }}
+                        </div>
+                    @else
+                        <div class="p-6">
+                            <h2>User Dashboard</h2>
+                            {{ $slot }}
+                        </div>
+                    @endif
                 </main>
             </div>
         </div>
@@ -58,7 +75,7 @@
                         </div>
 
                         <div class="mt-8">
-                            <button id="closeModalButton" class="w-full inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-transform transform hover:scale-105">
+                            <button id="closeModalButton" class="w-full inline-block px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 Done
                             </button>
                         </div>
