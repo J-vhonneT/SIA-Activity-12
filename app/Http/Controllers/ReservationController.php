@@ -1,7 +1,10 @@
 <?php
 
 
+
+
 namespace App\Http\Controllers;
+
 
 use App\Models\Reservation;
 use App\Models\QRCode;
@@ -12,7 +15,10 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCodeGenerator;
 
 
+
+
 use Illuminate\Support\Carbon;
+
 
 class ReservationController extends Controller
 {
@@ -21,7 +27,9 @@ class ReservationController extends Controller
     {
         $this->authorize('viewAny', Reservation::class); // Ensure only authorized users can see the list
 
+
         $query = Reservation::query();
+
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -34,10 +42,13 @@ class ReservationController extends Controller
             }
         }
 
+
         $reservations = $query->with('user')->orderBy('created_at', 'desc')->paginate(10);
-        
+       
         return view('reservations.index', compact('reservations'));
     }
+
+
 
 
     /**
@@ -50,6 +61,7 @@ class ReservationController extends Controller
         return view('reservations.edit', compact('reservation', 'slots'));
     }
 
+
     /**
      * Update the specified resource in storage.
      */
@@ -59,25 +71,31 @@ class ReservationController extends Controller
         abort(403);
     }
 
+
     $request->validate([
         'slot_number' => 'required|integer|min:1|max:12',
         'start_time' => 'required',
     ]);
 
-    // ALWAYS compute end time
-    $start = $request->start_time;
-    $end = \Carbon\Carbon::parse($start)->addHour()->format('H:i');
+
+    if ($request->end_time <= $request->start_time) {
+        return back()->withErrors([
+            'end_time' => 'End time must be after start time.'
+        ]);
+    }
+
 
     $reservation->update([
         'slot_number' => $request->slot_number,
-        'start_time' => $start,
-        'end_time' => $end,
+        'start_time' => $request->start_time,
+        'end_time' => $request->end_time,
     ]);
+
 
     return redirect()->route('manage-reservations')
         ->with('success', 'Reservation updated!');
 }
-    
+   
     public function create()
     {
         $slots = range(1, 12);
@@ -87,8 +105,10 @@ class ReservationController extends Controller
                                      ->orderBy('start_time')
                                      ->get();
 
+
         return view('reservations.create', compact('slots', 'todaysReservations'));
     }
+
 
     public function getBookedSlots(Request $request)
     {
@@ -117,6 +137,8 @@ class ReservationController extends Controller
     }
 
 
+
+
     public function store(Request $request)
     {
         $request->validate([
@@ -126,17 +148,21 @@ class ReservationController extends Controller
             'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
 
+
         $startTime = Carbon::createFromFormat('H:i', $request->start_time);
         $endTime = Carbon::createFromFormat('H:i', $request->end_time);
+
 
         // Rule 1: Enforce the 5-hour maximum booking duration.
         if ($startTime->diffInHours($endTime) > 5) {
             return back()->with('error', 'You can book a slot for a maximum of 5 hours.');
         }
 
+
         // Explicitly format times for the query
         $startTimeStr = $startTime->format('H:i:s');
         $endTimeStr = $endTime->format('H:i:s');
+
 
         // Rule 2: Check for conflicting reservations.
         $isConflict = Reservation::where('slot_number', $request->slot_number)
@@ -148,9 +174,11 @@ class ReservationController extends Controller
             })
             ->exists();
 
+
         if ($isConflict) {
             return back()->with('error', 'This slot is unavailable for the selected time range. It conflicts with an existing booking.');
         }
+
 
         // All checks passed, create the reservation.
         $reservation = Reservation::create([
@@ -162,6 +190,7 @@ class ReservationController extends Controller
             'expires_at' => Carbon::now()->addHours(24),
         ]);
 
+
         // Log the creation event
         $reservation->transactions()->create([
             'user_id' => $reservation->user_id,
@@ -170,8 +199,10 @@ class ReservationController extends Controller
             'event_timestamp' => now(),
         ]);
 
+
         // Generate a unique token for the QR code
         $token = Str::random(40);
+
 
         // Generate and save the QR code
         $qrCodeData = QrCodeGenerator::format('svg')->size(200)->generate($token);
@@ -181,6 +212,7 @@ class ReservationController extends Controller
             'token' => $token, // Save the token
         ]);
 
+
         // Log the QR code generation event
         $reservation->transactions()->create([
             'user_id' => $reservation->user_id,
@@ -189,11 +221,13 @@ class ReservationController extends Controller
             'event_timestamp' => now(),
         ]);
 
+
         return redirect()->route('dashboard')
                          ->with('success', 'Reservation confirmed successfully!')
                          ->with('new_qr_code', $qrCodeData)
                          ->with('new_reservation', $reservation);
     }
+
 
     public function showLatestQr()
     {
@@ -201,12 +235,16 @@ class ReservationController extends Controller
                                         ->latest('created_at')
                                         ->first();
 
+
         if ($latestReservation) {
             return redirect()->route('qr-code.index', ['reservation_id' => $latestReservation->id]);
         }
 
+
         return redirect()->route('reservations.index')->with('error', 'You have no reservations to show a QR code for.');
     }
+
+
 
 
     public function show(Reservation $reservation)
@@ -215,17 +253,22 @@ class ReservationController extends Controller
     }
 
 
+
+
     public function destroy(Reservation $reservation)
     {
        if (!auth()->user()->hasRole('admin')) {
         abort(403);
     }
 
+
     $reservation->delete();
+
 
     return redirect()->route('manage-reservations')
         ->with('success', 'Reservation deleted successfully.');
     }
+
 
     public function exportPDF()
     {
@@ -234,12 +277,14 @@ class ReservationController extends Controller
         return $pdf->download('reservations.pdf');
     }
 
+
     /**
      * Admin: Manage all reservations with pagination
      */
     public function manageReservations(Request $request)
     {
         $query = Reservation::with('user');
+
 
         // Search functionality
         if ($request->filled('search')) {
@@ -253,15 +298,19 @@ class ReservationController extends Controller
             });
         }
 
+
         // Filter by status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
+
         $reservations = $query->orderBy('created_at', 'desc')->paginate(5);
+
 
         return view('manage-reservations', compact('reservations'));
     }
+
 
     /**
      * Admin: Export all reservations as PDF

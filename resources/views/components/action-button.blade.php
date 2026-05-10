@@ -11,11 +11,11 @@ $colorClasses = match($color) {
 @endphp
 
 @if($href)
-    <a href="{{ $href }}" {{ $attributes->merge(['class' => 'inline-flex items-center px-4 py-2 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150 ' . $colorClasses]) }}>
+    <a href="{{ $href }}" {{ $attributes->merge(['class' => 'inline-flex items-center px-2 py-1 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150 ' . $colorClasses]) }}>
         {{ $slot }}
     </a>
 @else
-    <button {{ $attributes->merge(['class' => 'inline-flex items-center px-4 py-2 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150 ' . $colorClasses]) }}>
+    <button {{ $attributes->merge(['class' => 'inline-flex items-center px-2 py-1 rounded-md text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition ease-in-out duration-150 ' . $colorClasses]) }}>
         {{ $slot }}
     </button>
 @endif

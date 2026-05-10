@@ -83,27 +83,26 @@
                                             {{ $reservation->start_time }} - {{ $reservation->end_time }}
                                         </td>
 
-                                        <td class="px-6 py-4 text-center space-x-2">
-
-                                            <x-action-button color="blue"
-                                                href="{{ route('reservations.edit', $reservation) }}">
-                                                Edit
-                                            </x-action-button>
-
-                                            <form method="POST"
-                                                  action="{{ route('reservations.destroy', $reservation) }}"
-                                                  class="inline-block"
-                                                  onsubmit="return confirm('Delete this reservation?')">
-
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <x-action-button color="red" type="submit">
-                                                    Delete
+                                        <td class="px-6 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <x-action-button color="blue"
+                                                    href="{{ route('reservations.edit', $reservation) }}">
+                                                    Edit
                                                 </x-action-button>
 
-                                            </form>
+                                                <form method="POST"
+                                                      action="{{ route('reservations.destroy', $reservation) }}"
+                                                      onsubmit="return confirm('Delete this reservation?')">
 
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <x-action-button color="red" type="submit">
+                                                        Delete
+                                                    </x-action-button>
+
+                                                </form>
+                                            </div>
                                         </td>
 
                                     </tr>

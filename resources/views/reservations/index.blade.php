@@ -44,20 +44,22 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-center">Slot {{ $res->slot_number }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">{{ $res->reservation_date }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">{{ \Carbon\Carbon::parse($res->reservation_time)->format('g:i A') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
-                                            <x-action-button color="green" href="{{ route('qr-code.index', ['reservation_id' => $res->id]) }}">
-                                                👁️ View QR
-                                            </x-action-button>
-                                            <x-action-button color="blue" href="{{ route('reservations.edit', $res) }}">
-                                                ✏️ Edit
-                                            </x-action-button>
-                                            <form action="{{ route('reservations.destroy', $res) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <x-action-button color="red" type="submit">
-                                                    ❌ Cancel
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <x-action-button color="green" href="{{ route('qr-code.index', ['reservation_id' => $res->id]) }}">
+                                                    👁️ View QR
                                                 </x-action-button>
-                                            </form>
+                                                <x-action-button color="blue" href="{{ route('reservations.edit', $res) }}">
+                                                    ✏️ Edit
+                                                </x-action-button>
+                                                <form action="{{ route('reservations.destroy', $res) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <x-action-button color="red" type="submit">
+                                                        ❌ Cancel
+                                                    </x-action-button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
